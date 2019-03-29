@@ -7,24 +7,22 @@ export default class LSystem {
     expansionRule: ExpansionRule;
     drawingRule: DrawingRule;
     iterations : number
-    angle: number = 35.0;
     branchData: mat4[];
-    leafData: mat4[]
+    leafData: mat4[];
+    angle: number;
 
-    constructor(axiom: string, iterations: number) {
+    constructor(axiom: string, iterations: number, a: number) {
         this.axiom = axiom;
-        console.log("axiom: " + axiom);
+        // console.log("axiom: " + axiom);
         this.iterations = iterations;
         this.expansionRule = new ExpansionRule();
-        this.expansionRule.createExpansionRules();
-        this.drawingRule = new DrawingRule();
-        this.drawingRule.initTurtle();
-        this.drawingRule.createDrawingRules();
+        this.angle = a;
+        this.drawingRule = new DrawingRule(this.angle);
     }
 
     parseLSystem() {
         let expandedAxiom: string = this.expansionRule.expand(this.axiom, this.iterations);
-        console.log("expanded: " + expandedAxiom);
+        // console.log("expanded: " + expandedAxiom);
         this.drawingRule.draw(expandedAxiom);
         this.branchData = this.drawingRule.branchData;
         this.leafData = this.drawingRule.leafData;

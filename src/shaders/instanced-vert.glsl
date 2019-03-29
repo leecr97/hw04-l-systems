@@ -13,10 +13,10 @@ in vec3 vs_Translate; // Another instance rendering attribute used to position e
 in vec2 vs_UV; // Non-instanced, and presently unused in main(). Feel free to use it for your meshes.
 
 // instance rendering
-in vec4 vs_TransformCol1;
-in vec4 vs_TransformCol2;
-in vec4 vs_TransformCol3;
-in vec4 vs_TransformCol4;
+in vec4 vs_Transform1;
+in vec4 vs_Transform2;
+in vec4 vs_Transform3;
+in vec4 vs_Transform4;
 
 out vec4 fs_Col;
 out vec4 fs_Pos;
@@ -28,7 +28,7 @@ void main()
     fs_Pos = vs_Pos;
     fs_Nor = vs_Nor;
 
-    mat4 transform = mat4(vs_TransformCol1, vs_TransformCol2, vs_TransformCol3, vs_TransformCol4);
+    mat4 transform = mat4(vs_Transform1, vs_Transform2, vs_Transform3, vs_Transform4);
     vec4 tPos = transform * vs_Pos;
 
     gl_Position = u_ViewProj * tPos;

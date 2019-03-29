@@ -9,18 +9,25 @@ export default class DrawingRule {
     currTurtle: Turtle;
     turtleStack: Turtle[];
     drawingMap: Map<string, any> = new Map<string, any>();
-    angle: number = 35.0;
+    angle: number;
 
     branchData: mat4[] = [];
     leafData: mat4[] = [];
 
-    constructor() {
+    constructor(a: number) {
+        this.angle = a;
+        this.initTurtle();
+        this.createDrawingRules();
+        // this.lenscale = s / 5.0;
+        console.log("ang: " + this.angle);
     }
 
     initTurtle() {
         this.currTurtle = new Turtle(vec3.fromValues(0,0,0), 
                                      vec3.fromValues(0,1,0),
-                                     quat.fromValues(0,0,0,1), this.angle);
+                                     quat.fromValues(0,0,0,1), 
+                                     this.angle, 
+                                     vec3.fromValues(1,1,1), 0);
         this.turtleStack = [];
     }
 
@@ -28,12 +35,16 @@ export default class DrawingRule {
         // F - move forware
         this.drawingMap.set("F", this.currTurtle.moveForward.bind(this.currTurtle));
         // X - draw leaf
-        this.drawingMap.set("X", this.currTurtle.drawLeaf.bind(this.currTurtle));
+        // this.drawingMap.set("X", this.currTurtle.drawLeafRotate.bind(this.currTurtle));
+        this.drawingMap.set("L", this.currTurtle.drawLeaf.bind(this.currTurtle));
         // rotations
-        this.drawingMap.set("-", this.currTurtle.rotateRightPos.bind(this.currTurtle));
-        this.drawingMap.set("+", this.currTurtle.rotateUpPos.bind(this.currTurtle));
-        this.drawingMap.set("~", this.currTurtle.rotateForwardPos.bind(this.currTurtle));
-        // negative?
+        this.drawingMap.set("+", this.currTurtle.rotateForwardPos.bind(this.currTurtle));
+        this.drawingMap.set("=", this.currTurtle.rotateUpPos.bind(this.currTurtle));
+        this.drawingMap.set("~", this.currTurtle.rotateRightPos.bind(this.currTurtle));
+
+        this.drawingMap.set("-", this.currTurtle.rotateForwardNeg.bind(this.currTurtle));
+        this.drawingMap.set("_", this.currTurtle.rotateUpNeg.bind(this.currTurtle));
+        this.drawingMap.set("*", this.currTurtle.rotateRightNeg.bind(this.currTurtle));
     }
 
     pushTurtle() {
@@ -43,8 +54,10 @@ export default class DrawingRule {
         vec3.copy(ori, this.currTurtle.orientation);
         let q: quat = quat.create();
         quat.copy(q, this.currTurtle.quaternion);
+        let s: vec3 = vec3.create();
+        vec3.copy(s, this.currTurtle.scale);
 
-        let newT : Turtle = new Turtle(pos, ori, q, this.angle);
+        let newT : Turtle = new Turtle(pos, ori, q, this.currTurtle.angle, s, this.currTurtle.recursionDepth);
         this.turtleStack.push(newT);
     }
 
@@ -54,6 +67,9 @@ export default class DrawingRule {
             this.currTurtle.position = newT.position;
             this.currTurtle.orientation = newT.orientation;
             this.currTurtle.quaternion = newT.quaternion;
+            this.currTurtle.scale = newT.scale;
+            this.currTurtle.recursionDepth++;
+            this.currTurtle.angle = newT.angle;
             // console.log(this.currTurtle.getTransformation());
         }
     }
@@ -65,7 +81,6 @@ export default class DrawingRule {
 
             // stack stuff
             if (c == "[") {
-                // console.log(this.currTurtle.getTransformation());
                 this.pushTurtle();
             }
 
@@ -77,20 +92,29 @@ export default class DrawingRule {
             if (drawFunc) {
                 drawFunc();
 
-                let newMat: mat4 = this.currTurtle.getTransformation();
-                // console.log(newMat);
+                let mat: mat4;
+                mat = mat4.create();
 
-                if (c == 'X') {
-                    this.leafData.push(newMat);
+                if (c == 'L') {
+                    mat = this.currTurtle.getLeafTransformation();
+                    this.leafData.push(mat);
                 }
-                else {
-                    this.branchData.push(newMat);
+                else if (c == 'F') {
+                    if (this.currTurtle.scale[0] > 0.02) {
+                        this.currTurtle.scale[0] *= 0.95;
+                        this.currTurtle.scale[1] *= 0.99;
+                        this.currTurtle.scale[2] *= 0.95;
+                    }
+                    if (this.currTurtle.orientation[1] < 0 && this.currTurtle.recursionDepth < 4) {
+                        this.currTurtle.pointUp();
+                    }
+
+                    mat = this.currTurtle.getTransformation();
+                    this.branchData.push(mat);
                 }
             }
 
         }
-        // console.log("leaves: " + this.leafData.length);
-        // console.log("branches: " + this.branchData.length);
     }
 
 }

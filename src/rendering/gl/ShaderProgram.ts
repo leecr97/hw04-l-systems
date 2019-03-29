@@ -42,6 +42,8 @@ class ShaderProgram {
   unifUp: WebGLUniformLocation;
   unifDimensions: WebGLUniformLocation;
 
+  unifSeason: WebGLUniformLocation;
+
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
 
@@ -57,13 +59,13 @@ class ShaderProgram {
     this.attrCol = gl.getAttribLocation(this.prog, "vs_Col");
     this.attrNor = gl.getAttribLocation(this.prog, "vs_Nor");
     this.attrTranslate = gl.getAttribLocation(this.prog, "vs_Translate");
-
+    this.attrUV = gl.getAttribLocation(this.prog, "vs_UV");
+    
     this.attrTrans1 = gl.getAttribLocation(this.prog, "vs_Transform1");
     this.attrTrans2 = gl.getAttribLocation(this.prog, "vs_Transform2");
     this.attrTrans3 = gl.getAttribLocation(this.prog, "vs_Transform3");
     this.attrTrans4 = gl.getAttribLocation(this.prog, "vs_Transform4");
 
-    this.attrUV = gl.getAttribLocation(this.prog, "vs_UV");
     this.unifModel      = gl.getUniformLocation(this.prog, "u_Model");
     this.unifModelInvTr = gl.getUniformLocation(this.prog, "u_ModelInvTr");
     this.unifViewProj   = gl.getUniformLocation(this.prog, "u_ViewProj");
@@ -72,6 +74,8 @@ class ShaderProgram {
     this.unifEye   = gl.getUniformLocation(this.prog, "u_Eye");
     this.unifRef   = gl.getUniformLocation(this.prog, "u_Ref");
     this.unifUp   = gl.getUniformLocation(this.prog, "u_Up");
+
+    this.unifSeason   = gl.getUniformLocation(this.prog, "u_Season");
   }
 
   use() {
@@ -133,6 +137,13 @@ class ShaderProgram {
     this.use();
     if (this.unifTime !== -1) {
       gl.uniform1f(this.unifTime, t);
+    }
+  }
+
+  setSeason(s: number) {
+    this.use();
+    if (this.unifSeason !== -1) {
+      gl.uniform1f(this.unifSeason, s);
     }
   }
 
