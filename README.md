@@ -10,7 +10,7 @@ Email: leecr@seas.upenn.edu
 ![](introimage.png)
 
 ## Live Project Demo
-[Link](https://leecr97.github.io/hw05-road-generation/)
+[Link](https://leecr97.github.io/l-systems/)
 
 ## Project Description
 This project is a procedurally generated tree using an L-System program. It uses a set of formal grammar rules to expand and represent the L-System. The project also makes extensive use of instanced rendering to pass necessary transform data from the CPU to the GPU for more efficient rendering.
